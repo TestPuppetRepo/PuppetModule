@@ -1,0 +1,3 @@
+# = Class: ssh
+class ssh {
+}

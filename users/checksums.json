@@ -1,0 +1,14 @@
+{
+  "Gemfile": "dbc1a15e3a264c03878028240cfc5d89",
+  "README.md": "2aaa5ef1795e95f9affafa92ec970c48",
+  "Rakefile": "20b80e526e351a74df2001f504e756d2",
+  "lib/puppet/parser/functions/users_filter_by_group.rb": "e81504da7f8247b2dcd16359055e0190",
+  "lib/puppet/parser/functions/users_hash_sshkeys.rb": "1f3f317941acd6c70a7ad44c69e737a4",
+  "lib/puppet/parser/functions/users_merge_sshkeys.rb": "55b2fe07b2355e617e69944b87d279dd",
+  "manifests/init.pp": "4edd5d7c6a79b6117e889f4bcb596421",
+  "manifests/user.pp": "bbdad327d3f990eb9c4ac2f5dbfb4f4a",
+  "metadata.json": "c7fa91ad11f9f27a82ed46649643cdbb",
+  "spec/classes/init_spec.rb": "9095db00ed4e0193d244193c349cfce8",
+  "spec/spec_helper.rb": "0db89c9a486df193c0e40095422e19dc",
+  "tests/init.pp": "6f50cb2556a0f1b573477cff48607baf"
+}

@@ -1,0 +1,409 @@
+# MANAGED BY PUPPET (ssh/templates, via params/hiera)
+# See the sshd_config(5) manpage for details
+
+# This is the sshd server system-wide configuration file.  See
+# sshd_config(5) for more information.
+
+# The strategy used for options in the default sshd_config shipped with
+# OpenSSH is to specify options with their default value where
+# possible, but leave them commented.  Uncommented options override the
+# default value.
+
+
+<% if @options['Port'] -%>
+<% if @options['Port'].respond_to?('each') -%>
+<% @options['Port'].each do |port| -%>
+Port <%= port %>
+<% end -%>
+<% else -%>
+Port <%= @options['Port'] %>
+<% end -%>
+<% else -%>
+#Port 22
+<% end -%>
+<% if @options['AddressFamily'] -%>
+AddressFamily <%= @options['AddressFamily'] %>
+<% else -%>
+#AddressFamily any
+<% end -%>
+#ListenAddress 0.0.0.0
+#ListenAddress ::
+<% if @listen_address.respond_to?('each') -%>
+<% @listen_address.each do |listener| -%>
+ListenAddress <%= listener %>
+<% end -%>
+<% else -%>
+ListenAddress <%= @listen_address %>
+<% end -%>
+
+# The default requires explicit activation of protocol 1 starting
+# with openssh-5.4.
+# Defaulting to protocol 2 unless otherwise specified
+# regardless of openssh version.
+Protocol <%= @options['Protocol'] || '2' %>
+
+<% if @options['HostKey'] -%>
+<% if @options['HostKey'].respond_to?('each') -%>
+<% @options['HostKey'].each do |hostkey_pathname| -%>
+HostKey <%= hostkey_pathname %>
+<% end -%>
+<% else -%>
+HostKey <%= @options['HostKey'] %>
+<% end -%>
+<% else -%>
+# HostKey for protocol version 1
+#HostKey /etc/ssh/ssh_host_key
+# HostKeys for protocol version 2
+#HostKey /etc/ssh/ssh_host_rsa_key
+#HostKey /etc/ssh/ssh_host_dsa_key
+#HostKey /etc/ssh/ssh_host_ecdsa_key
+#HostKey /etc/ssh/ssh_host_ed25519_key
+<% end -%>
+
+# Lifetime and size of ephemeral version 1 server key
+# Unless specified, setting ServerKeyBits to newer default of 1024
+<% if @options['KeyRegenerationInterval'] -%>
+KeyRegenerationInterval <%= @options['KeyRegenerationInterval'] %>
+<% else -%>
+#KeyRegenerationInterval 1h
+<% end -%>
+ServerKeyBits <%= @options['ServerKeyBits'] || '1024' %>
+
+# Ciphers and keying
+#RekeyLimit default none
+
+# Logging
+# obsoletes QuietMode and FascistLogging
+<% if @options['SyslogFacility'] -%>
+SyslogFacility <%= @options['SyslogFacility'] %>
+<% elsif @osfamily == 'RedHat' -%>
+SyslogFacility <%= @options['SyslogFacility'] || 'AUTHPRIV' %>
+<% else -%>
+#SyslogFacility AUTH
+<% end -%>
+<% if @options['LogLevel'] -%>
+LogLevel <%= @options['LogLevel'] %>
+<% else -%>
+#LogLevel INFO
+<% end -%>
+
+# Authentication:
+
+<% if @options['LoginGraceTime'] -%>
+LoginGraceTime <%= @options['LoginGraceTime'] %>
+<% else -%>
+#LoginGraceTime 2m
+<% end -%>
+PermitRootLogin <%= @permit_root_login %>
+<% if @options['StrictModes'] -%>
+StrictModes <%= @options['StrictModes'] %>
+<% else -%>
+#StrictModes yes
+<% end -%>
+<% if @options['MaxAuthTries'] -%>
+MaxAuthTries <%= @options['MaxAuthTries'] %>
+<% else -%>
+#MaxAuthTries 6
+<% end -%>
+<% if @options['MaxSessions'] -%>
+MaxSessions <%= @options['MaxSessions'] %>
+<% else -%>
+#MaxSessions 10
+<% end -%>
+
+<% if @options['RSAAuthentication'] -%>
+RSAAuthentication <%= @options['RSAAuthentication'] %>
+<% else -%>
+#RSAAuthentication yes
+<% end -%>
+<% if @options['PubkeyAuthentication'] -%>
+PubkeyAuthentication <%= @options['PubkeyAuthentication'] %>
+<% else -%>
+#PubkeyAuthentication yes
+<% end -%>
+
+<% if @options['AuthorizedKeysFile'] -%>
+AuthorizedKeysFile <%= @options['AuthorizedKeysFile'] %>
+<% else -%>
+# The default is to check both .ssh/authorized_keys and .ssh/authorized_keys2
+# but this is overridden so installations will only check .ssh/authorized_keys
+AuthorizedKeysFile	.ssh/authorized_keys
+<% end -%>
+
+<% if @options['AuthorizedPrincipalsFile'] -%>
+AuthorizedPrincipalsFile <%= @options['AuthorizedPrincipalsFile'] %>
+<% else -%>
+#AuthorizedPrincipalsFile none
+<% end -%>
+
+<% if @options['AuthorizedKeysCommand'] -%>
+AuthorizedKeysCommand <%= @options['AuthorizedKeysCommand'] %>
+<% else -%>
+#AuthorizedKeysCommand none
+<% end -%>
+<% if @options['AuthorizedKeysCommandUser'] -%>
+AuthorizedKeysCommandUser <%= @options['AuthorizedKeysCommandUser'] %>
+<% else -%>
+#AuthorizedKeysCommandUser nobody
+<% end -%>
+
+# For this to work you will also need host keys in /etc/ssh/ssh_known_hosts
+<% if @options['RhostsRSAAuthentication'] -%>
+RhostsRSAAuthentication <%= @options['RhostsRSAAuthentication'] %>
+<% else -%>
+#RhostsRSAAuthentication no
+<% end -%>
+# similar for protocol version 2
+<% if @options['HostbasedAuthentication'] -%>
+HostbasedAuthentication <%= @options['HostbasedAuthentication'] %>
+<% else -%>
+#HostbasedAuthentication no
+<% end -%>
+# Change to yes if you don't trust ~/.ssh/known_hosts for
+# RhostsRSAAuthentication and HostbasedAuthentication
+<% if @options['IgnoreUserKnownHosts'] -%>
+IgnoreUserKnownHosts <%= @options['IgnoreUserKnownHosts'] %>
+<% else -%>
+#IgnoreUserKnownHosts no
+<% end -%>
+# Don't read the user's ~/.rhosts and ~/.shosts files
+<% if @options['IgnoreRhosts'] -%>
+IgnoreRhosts <%= @options['IgnoreRhosts'] %>
+<% else -%>
+#IgnoreRhosts yes
+<% end -%>
+
+# To disable tunneled clear text passwords, change to no here!
+<% if @options['PasswordAuthentication'] -%>
+PasswordAuthentication <%= @options['PasswordAuthentication'] %>
+<% else -%>
+#PasswordAuthentication yes
+<% end -%>
+<% if @options['PermitEmptyPasswords'] -%>
+PermitEmptyPasswords <%= @options['PermitEmptyPasswords'] %>
+<% else -%>
+#PermitEmptyPasswords no
+<% end -%>
+
+# Change to no to disable s/key passwords
+<% if @options['ChallengeResponseAuthentication'] -%>
+ChallengeResponseAuthentication <%= @options['ChallengeResponseAuthentication'] %>
+<% else -%>
+#ChallengeResponseAuthentication yes
+<% end -%>
+
+# Kerberos options
+<% if @options['KerberosAuthentication'] -%>
+KerberosAuthentication <%= @options['KerberosAuthentication'] %>
+<% else -%>
+#KerberosAuthentication no
+<% end -%>
+<% if @options['KerberosOrLocalPasswd'] -%>
+KerberosOrLocalPasswd <%= @options['KerberosOrLocalPasswd'] %>
+<% else -%>
+#KerberosOrLocalPasswd yes
+<% end -%>
+<% if @options['KerberosTicketCleanup'] -%>
+KerberosTicketCleanup <%= @options['KerberosTicketCleanup'] %>
+<% else -%>
+#KerberosTicketCleanup yes
+<% end -%>
+<% if @options['KerberosGetAFSToken'] -%>
+KerberosGetAFSToken <%= @options['KerberosGetAFSToken'] %>
+<% else -%>
+#KerberosGetAFSToken no
+<% end -%>
+
+# GSSAPI options
+<% if @options['GSSAPIAuthentication'] -%>
+GSSAPIAuthentication <%= @options['GSSAPIAuthentication'] %>
+<% else -%>
+#GSSAPIAuthentication no
+<% end -%>
+<% if @options['GSSAPICleanupCredentials'] -%>
+GSSAPICleanupCredentials <%= @options['GSSAPICleanupCredentials'] %>
+<% else -%>
+#GSSAPICleanupCredentials yes
+<% end -%>
+
+# Set this to 'yes' to enable PAM authentication, account processing,
+# and session processing. If this is enabled, PAM authentication will
+# be allowed through the ChallengeResponseAuthentication and
+# PasswordAuthentication.  Depending on your PAM configuration,
+# PAM authentication via ChallengeResponseAuthentication may bypass
+# the setting of "PermitRootLogin without-password".
+# If you just want the PAM account and session checks to run without
+# PAM authentication, then enable this but set PasswordAuthentication
+# and ChallengeResponseAuthentication to 'no'.
+<% if @options['UsePAM'] -%>
+UsePAM <%= @options['UsePAM'] %>
+<% elsif @osfamily == 'Debian' -%>
+UsePAM yes
+<% elsif @osfamily == 'RedHat' -%>
+UsePAM yes
+<% else -%>
+#UsePAM no
+<% end -%>
+
+
+<% if @options['AllowAgentForwarding'] -%>
+AllowAgentForwarding <%= @options['AllowAgentForwarding'] %>
+<% else -%>
+#AllowAgentForwarding yes
+<% end -%>
+<% if @options['AllowTcpForwarding'] -%>
+AllowTcpForwarding <%= @options['AllowTcpForwarding'] %>
+<% else -%>
+#AllowTcpForwarding yes
+<% end -%>
+<% if @options['GatewayPorts'] -%>
+GatewayPorts <%= @options['GatewayPorts'] %>
+<% else -%>
+#GatewayPorts no
+<% end -%>
+<% if @options['X11Forwarding'] -%>
+X11Forwarding <%= @options['X11Forwarding'] %>
+<% elsif @osfamily == 'Debian' || @osfamily == 'RedHat' -%>
+# Debian and RedHat set X11Forwarding to yes.
+X11Forwarding yes
+<% else -%>
+#X11Forwarding no
+<% end -%>
+<% if @options['X11DisplayOffset'] -%>
+X11DisplayOffset <%= @options['X11DisplayOffset'] %>
+<% else -%>
+#X11DisplayOffset 10
+<% end -%>
+<% if @options['X11UseLocalhost'] -%>
+X11UseLocalhost <%= @options['X11UseLocalhost'] %>
+<% else -%>
+#X11UseLocalhost yes
+<% end -%>
+<% if @options['PermitTTY'] -%>
+PermitTTY <%= @options['PermitTTY'] %>
+<% else -%>
+#PermitTTY yes
+<% end -%>
+<% if @options['PrintMotd'] -%>
+PrintMotd <%= @options['PrintMotd'] %>
+<% else -%>
+#PrintMotd yes
+<% end -%>
+<% if @options['PrintLastLog'] -%>
+PrintLastLog <%= @options['PrintLastLog'] %>
+<% else -%>
+#PrintLastLog yes
+<% end -%>
+<% if @options['TCPKeepAlive'] -%>
+TCPKeepAlive <%= @options['TCPKeepAlive'] %>
+<% else -%>
+#TCPKeepAlive yes
+<% end -%>
+<% if @options['UseLogin'] -%>
+UseLogin <%= @options['UseLogin'] %>
+<% else -%>
+#UseLogin no
+<% end -%>
+<% if @options['UsePrivilegeSeparation'] -%>
+UsePrivilegeSeparation <%= @options['UsePrivilegeSeparation'] %>
+<% else -%>
+# If openssh version is >= 6.1 consider using UsePrivilegeSeparation sandbox
+#UsePrivilegeSeparation yes
+<% end -%>
+<% if @options['PermitUserEnvironment'] -%>
+PermitUserEnvironment <%= @options['PermitUserEnvironment'] %>
+<% else -%>
+#PermitUserEnvironment no
+<% end -%>
+<% if @options['Compression'] -%>
+Compression <%= @options['Compression'] %>
+<% else -%>
+#Compression delayed
+<% end -%>
+<% if @options['ClientAliveInterval'] -%>
+ClientAliveInterval <%= @options['ClientAliveInterval'] %>
+<% else -%>
+#ClientAliveInterval 0
+<% end -%>
+<% if @options['ClientAliveCountMax'] -%>
+ClientAliveCountMax <%= @options['ClientAliveCountMax'] %>
+<% else -%>
+#ClientAliveCountMax 3
+<% end -%>
+<% if @options['UseDNS'] -%>
+UseDNS <%= @options['UseDNS'] %>
+<% else -%>
+#UseDNS yes
+<% end -%>
+<% if @options['PidFile'] -%>
+PidFile <%= @options['PidFile'] %>
+<% else -%>
+#PidFile /var/run/sshd.pid
+<% end -%>
+<% if @options['MaxStartups'] -%>
+MaxStartups <%= @options['MaxStartups'] %>
+<% else -%>
+#MaxStartups 10:30:100
+<% end -%>
+<% if @options['PermitTunnel'] -%>
+PermitTunnel <%= @options['PermitTunnel'] %>
+<% else -%>
+#PermitTunnel no
+<% end -%>
+<% if @options['ChrootDirectory'] -%>
+ChrootDirectory <%= @options['ChrootDirectory'] %>
+<% else -%>
+#ChrootDirectory none
+<% end -%>
+<% if @options['VersionAddendum'] -%>
+VersionAddendum <%= @options['VersionAddendum'] %>
+<% else -%>
+#VersionAddendum none
+<% end -%>
+
+# no default banner path
+<% if @options['Banner'] -%>
+Banner <%= @options['Banner'] %>
+<% else -%>
+#Banner none
+<% end -%>
+
+<% if @osfamily == 'Debian' -%>
+Subsystem sftp /usr/lib/openssh/sftp-server
+<% elsif @osfamily == 'RedHat' -%>
+Subsystem sftp /usr/libexec/openssh/sftp-server
+<% else -%>
+Subsystem	sftp	/usr/libexec/sftp-server
+<% end -%>
+
+<% if @options['AcceptEnv'] -%>
+<% if @options['AcceptEnv'].respond_to?('each') -%>
+<% @options['AcceptEnv'].each do |env| -%>
+AcceptEnv <%= env %>
+<% end -%>
+<% else -%>
+AcceptEnv <%= @options['AcceptEnv'] %>
+<% end -%>
+<% else -%>
+<% if @osfamily == 'Debian' -%>
+AcceptEnv LANG LC_*
+<% elsif @osfamily == 'RedHat' -%>
+AcceptEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES
+AcceptEnv LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT
+AcceptEnv LC_IDENTIFICATION LC_ALL LANGUAGE
+AcceptEnv XMODIFIERS
+<% end -%>
+
+<% if @options['DenyUsers'] -%>
+DenyUsers <%= @options['DenyUsers'] %>
+<% end -%>
+<% if @options['AllowUsers'] -%>
+AllowUsers <%= @options['AllowUsers'] %>
+<% end -%>
+<% if @options['DenyGroups'] -%>
+DenyGroups <%= @options['DenyGroups'] %>
+<% end -%>
+<% if @options['AllowGroups'] -%>
+AllowGroups <%= @options['AllowGroups'] %>
+<% end -%>
+<% end -%>
